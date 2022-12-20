@@ -11,6 +11,9 @@ namespace Dancingway
 {
     public class Emotelist
     {
+        // TEST LINE TO SEE IF STUFF SHOWS ON GITHUB DESKTOP... second test, it didnt show in github desktop software
+        private string testySaurus;
+        // /test bit
         private List<Emote> emoteList;
         private Random rnd;
 
