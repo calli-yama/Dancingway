@@ -72,8 +72,8 @@ namespace Dancingway
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
-            this.CommandManager.RemoveHandler("/dancingway");
-            this.CommandManager.RemoveHandler("/ddr");
+            //Service.CommandManager.RemoveHandler("/dancingway");
+            Service.CommandManager.RemoveHandler("/ddr");
         }
 
         /* this isn't needed until viewing/editing of the cached list is implemented. [2.0 feature]

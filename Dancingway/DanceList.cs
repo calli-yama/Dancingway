@@ -34,7 +34,14 @@ namespace Dancingway
             emoteList.Clear();
             foreach (var itemID in rowIDs)
             {
-                string emote = Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.TextCommand.ToString();
+                string rawText = Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.TextCommand.ToString();
+                // produces: "Lumina.Excel.GeneratedSheets.TextCommand#617" in test environment, 44 characters long
+
+                // test
+                //string emote = rawText.Remove(41);
+                uint textCommandID = Convert.ToUInt32(Int32.Parse(rawText.Remove(0,41)));
+                string emote = Service.DataManager.GetExcelSheet<TextCommand>()!.GetRow(textCommandID).Command.ToString();
+
                 Dance newDance = new Dance(itemID, emote);
                 emoteList.Add(newDance);
             }
