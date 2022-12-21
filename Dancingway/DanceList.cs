@@ -9,6 +9,7 @@ using Dalamud.Plugin;
 using Dalamud.Data;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 
 namespace Dancingway
@@ -34,16 +35,23 @@ namespace Dancingway
             emoteList.Clear();
             foreach (var itemID in rowIDs)
             {
-                string rawText = Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.TextCommand.ToString();
-                // produces: "Lumina.Excel.GeneratedSheets.TextCommand#617" in test environment, 44 characters long
+                ushort tempString = Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.Order;
+                if (tempString == 0) continue;
 
-                // test
-                //string emote = rawText.Remove(41);
-                uint textCommandID = Convert.ToUInt32(Int32.Parse(rawText.Remove(0,41)));
-                string emote = Service.DataManager.GetExcelSheet<TextCommand>()!.GetRow(textCommandID).Command.ToString();
+                // i need to find out how to get the uistate initiated, it aint workin yo!!!
+                if (Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.UnlockLink == 0 || UIState.fpIsUnlockLinkUnlockedOrQuestCompleted(Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.UnlockLink){
 
-                Dance newDance = new Dance(itemID, emote);
-                emoteList.Add(newDance);
+                    string rawText = Service.DataManager.GetExcelSheet<Emote>()!.GetRow(itemID)!.TextCommand.ToString();
+                    // produces: "Lumina.Excel.GeneratedSheets.TextCommand#617" in test environment, 44 characters long
+
+                    uint textCommandID = Convert.ToUInt32(Int32.Parse(rawText.Remove(0, 41)));
+                    string emote = Service.DataManager.GetExcelSheet<TextCommand>()!.GetRow(textCommandID).Command.ToString();
+
+                    Dance newDance = new Dance(itemID, emote);
+                    emoteList.Add(newDance);
+                }
+
+
             }
         }
 
