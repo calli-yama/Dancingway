@@ -23,14 +23,14 @@ namespace Dancingway
         public Configuration Configuration { get; init; }
         public WindowSystem WindowSystem = new("Dancingway");
 
-        public Dancingway.EmoteList emoteLister = new Emotelist;
+        public Dancingway.DanceList emoteLister = new DanceList();
 
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+        public Plugin(DalamudPluginInterface pluginInterface)
         {
+            pluginInterface.Create<Service>();
+
             this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
+
             XivCommon = new XivCommonBase();
 
             this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
@@ -43,20 +43,30 @@ namespace Dancingway
             WindowSystem.AddWindow(new ConfigWindow(this));
             WindowSystem.AddWindow(new MainWindow(this, goatImage));
 
-            //this.CommandManager.AddHandler(CommandName, new CommandInfo(OnDancingway)
+            // [2.0 feature] for when the plugin is turned on,just display our main ui
+            // until viewing/editing of the cached list is implemented, don't need this
+            /*
             this.CommandManager.AddHandler("/dancingway", new CommandInfo(OnDancingway)
             {
                 HelpMessage = "Open Dancingway settings window. Use '/dancingway'."
             });
+            */
 
-            //this.CommandManager.AddHandler(CommandName, new CommandInfo(OnDDR)
-            this.CommandManager.AddHandler("/ddr", new CommandInfo(OnDDR)
+            // for when the Dancingway Decision Roulette is called without modifiers
+            Service.CommandManager.AddHandler("/ddr", new CommandInfo(OnDDR)
             {
                 HelpMessage = "Executes a random dance from the chosen list. Use '/ddr'."
             });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+
+            // initialise the list of emotes
+            emoteLister.InitialiseDanceList();
+
+            // TEST TEST
+            //this.EmoteList.TestBuild();
+            emoteLister.BuildDanceList();
         }
 
         public void Dispose()
@@ -66,16 +76,14 @@ namespace Dancingway
             this.CommandManager.RemoveHandler("/ddr");
         }
 
+        /* this isn't needed until viewing/editing of the cached list is implemented. [2.0 feature]
         private void OnDancingway(string command, string args)
         {
-            // in response to the slash command, just display our main ui
+            // in response to the slash command, 
             WindowSystem.GetWindow("Dancingway Settings Window").IsOpen = true;
-            // initialise the list of emotes
-            Emotelist.InitialiseEmoteList();
-
-            // TEST TEST
-            Emotelist.TestBuild();
         }
+        */
+
 
         private void OnDDR(string command, string args)
         {
@@ -84,7 +92,7 @@ namespace Dancingway
             old code */
 
             // new test code
-            XivCommon.Functions.Chat.SendMessage("/dance");
+            XivCommon.Functions.Chat.SendMessage(emoteLister.getRandomDance());
         }
 
         private void DrawUI()
